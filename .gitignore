@@ -1,0 +1,46 @@
+# --- Python bytecode & caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Packaging / distribution ---
+build/
+dist/
+*.egg
+*.egg-info/
+
+# --- Test & coverage caches ---
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# --- Tool caches ---
+.mypy_cache/
+.ruff_cache/
+
+# --- Editors & IDEs ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- OS junk (Windows + macOS) ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# --- Pygame runtime artifacts ---
+# Committed art lives in assets/; keep stray captures out of the repo.
+screenshots/
+# Save-game files; ignore whatever the runtime writes.
+*.sav
+saves/
