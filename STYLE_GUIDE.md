@@ -5,6 +5,10 @@
 - Use the approved original 16-bit Western-fantasy direction: earthy materials,
   cool shadows, upper-left lighting, strong silhouettes, and deliberate pixel
   clusters.
+- Use the canonical VGA Mode 13h default palette defined in `palette.py` for
+  every new or replacement asset. Opaque pixels must match one of its RGB
+  entries exactly; transparent sheets use only alpha 0 or 255. Keep each asset
+  on a focused subset of the full 256-slot palette.
 - Use committed PNG family sprite sheets loaded through graphics/assets.py.
   Runtime code may composite, crop, fade, dim, shake, and fill dynamic bars,
   but must not generate replacement art.
