@@ -76,7 +76,7 @@ class GraphicsCacheTests(unittest.TestCase):
                     sheet.get_size(),
                     (grid[0] * cell_size[0], grid[1] * cell_size[1]),
                 )
-                self.assertEqual(audit_surface(sheet, 2, alpha), [])
+                self.assertEqual(audit_surface(sheet, 1, alpha), [])
 
     def test_cache_has_expected_surface_sizes(self):
         cache = graphics.build_cache()
