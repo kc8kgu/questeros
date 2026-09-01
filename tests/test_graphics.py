@@ -30,6 +30,7 @@ from graphics.ui import (
     CURSOR, ICON_KEYS, PANEL, PANEL_ALT, UI_BAR_FILL, UI_BAR_FRAME,
     UI_DIVIDER,
 )
+from tools.vga_art import audit_surface
 
 
 class GraphicsCacheTests(unittest.TestCase):
@@ -61,6 +62,21 @@ class GraphicsCacheTests(unittest.TestCase):
                 (grid[0] * cell_size[0], grid[1] * cell_size[1]),
             )
             self.assertEqual(bool(sheet.get_flags() & pygame.SRCALPHA), alpha)
+
+    def test_vga_pilot_sheets_obey_art_contract(self):
+        pilot_names = (
+            "overworld_simple_vga",
+            "exploration_vga",
+        )
+        for name in pilot_names:
+            relative, grid, cell_size, alpha = assets.SHEET_SPECS[name]
+            sheet = pygame.image.load(str(assets.ASSET_ROOT / relative))
+            with self.subTest(name=name):
+                self.assertEqual(
+                    sheet.get_size(),
+                    (grid[0] * cell_size[0], grid[1] * cell_size[1]),
+                )
+                self.assertEqual(audit_surface(sheet, 2, alpha), [])
 
     def test_cache_has_expected_surface_sizes(self):
         cache = graphics.build_cache()

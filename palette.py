@@ -189,6 +189,7 @@ EARTH_RAMP = (
     palette_color(138), BROWN, palette_color(65), palette_color(66),
     palette_color(67),
 )
+SAND_RAMP = (BROWN, OCHRE, DUNE_DARK, ORANGE, DUNE, DUNE_LIGHT)
 STONE_RAMP = (
     INK, ROCK_SHADOW, STEEL_DARK, ROCK, GREY, ROCK_LIGHT, STEEL_LIGHT,
 )
@@ -212,6 +213,7 @@ INTERFACE_RAMP = (BLACK, INK, DKGREY, GREY, LTGREY, WHITE_WARM, WHITE)
 RAMPS = {
     "foliage": FOLIAGE_RAMP,
     "earth": EARTH_RAMP,
+    "sand": SAND_RAMP,
     "stone": STONE_RAMP,
     "water": WATER_RAMP,
     "skin": SKIN_RAMP,

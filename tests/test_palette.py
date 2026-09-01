@@ -50,7 +50,7 @@ class PaletteTests(unittest.TestCase):
 
     def test_material_ramps_only_use_master_palette_colors(self):
         expected = {
-            "foliage", "earth", "stone", "water", "skin",
+            "foliage", "earth", "sand", "stone", "water", "skin",
             "metal", "fire", "magic", "interface",
         }
         self.assertEqual(set(palette.RAMPS), expected)

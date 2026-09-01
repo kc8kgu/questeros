@@ -22,6 +22,30 @@ SHEET_SPECS = {
     "screens": ("scenes/screens.png", (3, 1), (320, 208), False),
     "ui": ("ui/ui.png", (8, 5), (16, 16), True),
     "effects_battle": ("effects/battle.png", (6, 1), (160, 80), True),
+    "overworld_simple_vga": (
+        "tiles/overworld-simple-vga.png", (6, 1), (64, 64), False),
+    "exploration_vga": (
+        "sprites/exploration-vga.png", (4, 1), (64, 64), True),
+}
+
+VGA_OVERWORLD_MAP = {
+    **{key: (0, 0) for key in ("grass", "grass:v1", "grass:v2", "grass:v3")},
+    **{key: (1, 0) for key in ("sand", "sand:v1", "sand:v2", "sand:v3")},
+    **{f"water:m{mask:02x}": (2, 0) for mask in range(16)},
+    **{f"tree:m{mask:02x}": (3, 0) for mask in range(16)},
+    **{f"mountain:m{mask:02x}": (4, 0) for mask in range(16)},
+    "water": (2, 0),
+    "tree": (3, 0),
+    "mountain": (4, 0),
+    "town": (5, 0),
+}
+
+VGA_PLAYER_MAP = {
+    "player:up": (0, 0),
+    "player:down": (1, 0),
+    "player:left": (2, 0),
+    "player:right": (3, 0),
+    "player": (1, 0),
 }
 
 GRASS_KEYS = ("grass", "grass:v1", "grass:v2", "grass:v3")
@@ -252,4 +276,10 @@ def build_cache():
     cache.update(_mapped(sheets["screens"], "screens", SCREEN_MAP))
     cache.update(_mapped(sheets["ui"], "ui", UI_MAP))
     cache.update(_mapped(sheets["effects_battle"], "effects_battle", EFFECT_MAP))
+    # Versioned VGA artwork intentionally overrides matching legacy keys.
+    cache.update(_mapped(
+        sheets["overworld_simple_vga"],
+        "overworld_simple_vga", VGA_OVERWORLD_MAP))
+    cache.update(_mapped(
+        sheets["exploration_vga"], "exploration_vga", VGA_PLAYER_MAP))
     return cache

@@ -26,6 +26,14 @@
 
 ## Asset families
 
+- tiles/overworld-simple-vga.png: 6x1 opaque 64px cells containing grass,
+  sand, water, forest, mountain, and town in that order. Overworld scenery is
+  drawn as ordinary single-cell tiles without large overlays.
+- sprites/exploration-vga.png: 4x1 transparent 64px player cells ordered up,
+  down, left, right.
+- VGA pilot artwork is authored on the 32px logical grid and committed at 2x
+  size with nearest-neighbor pixels. Every source pixel remains a uniform 2x2
+  block.
 - tiles/overworld.png: 8x6 64px cells: 4 grass, 4 sand, 16 shoreline,
   8 forest, 8 mountain, and landmarks/spares.
 - tiles/town.png: 5x5 64px cells with 16 wall masks, plaza, gate, and six

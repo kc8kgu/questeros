@@ -9,9 +9,8 @@ import settings as s
 from camera import Camera
 from game_map import GameMap
 from graphics.actors import PLAYER
-from map_view import (
-    DOWN, LEFT, RIGHT, UP, MapView, _is_cluster_anchor, _shoreline_flip,
-)
+from graphics.terrain import mountain_key, tree_key
+from map_view import MapView
 
 
 class MapViewTests(unittest.TestCase):
@@ -62,30 +61,33 @@ class MapViewTests(unittest.TestCase):
         self.assertEqual(screen.get_at((99, 96))[:3], p.CRIMSON)
         self.assertEqual(screen.get_at((191, 191))[:3], p.GOLD)
 
-    def test_cluster_props_are_thinned_without_leaving_blocked_cells_bare(self):
-        game_map = GameMap([["tree"] * 5 for _ in range(5)], {"tree"})
-        anchors = {
-            (x, y)
-            for y in range(game_map.height)
-            for x in range(game_map.width)
-            if _is_cluster_anchor(game_map, x, y, "tree")
+    def test_world_scenery_uses_only_single_cell_tiles(self):
+        tree = pygame.Surface((s.TILE, s.TILE))
+        tree.fill(p.GREEN)
+        mountain = pygame.Surface((s.TILE, s.TILE))
+        mountain.fill(p.GREY)
+        town = pygame.Surface((s.TILE, s.TILE))
+        town.fill(p.GOLD)
+        player_art = pygame.Surface((s.TILE, s.TILE), pygame.SRCALPHA)
+        cache = {
+            tree_key(0): tree,
+            mountain_key(0): mountain,
+            "town": town,
+            "player:down": player_art,
         }
+        screen = pygame.Surface((s.TILE * 3, s.TILE))
+        view = MapView(view_width=3, view_height=1)
 
-        self.assertLess(len(anchors), game_map.width * game_map.height)
-        for y in range(game_map.height):
-            for x in range(game_map.width):
-                self.assertTrue(any(
-                    (x + dx, y + dy) in anchors
-                    for dy in (-1, 0, 1)
-                    for dx in (-1, 0, 1)
-                ))
+        view.draw(
+            screen, GameMap([["tree", "mountain", "town"]]),
+            SimpleNamespace(fx=2.0, fy=0.0, facing="down"), cache,
+            Camera(3, 1),
+        )
 
-    def test_straight_shoreline_variants_only_flip_along_the_coast(self):
-        self.assertEqual(
-            _shoreline_flip(UP | RIGHT | DOWN, 1, 0), (False, True))
-        self.assertEqual(
-            _shoreline_flip(RIGHT | DOWN | LEFT, 1, 0), (True, False))
-        self.assertEqual(_shoreline_flip(RIGHT, 1, 0), (False, False))
+        self.assertEqual(screen.get_at((32, 32))[:3], p.GREEN)
+        self.assertEqual(screen.get_at((96, 32))[:3], p.GREY)
+        self.assertEqual(screen.get_at((160, 32))[:3], p.GOLD)
+        self.assertEqual(view._scaled_art, {})
 
 
 if __name__ == "__main__":
