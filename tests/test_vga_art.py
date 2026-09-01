@@ -106,6 +106,20 @@ class VgaArtTests(unittest.TestCase):
         self.assertEqual(result.get_at((2, 2))[:3], palette.ROCK)
         self.assertEqual(vga_art.audit_surface(result), [])
 
+    def test_outline_cleans_pale_edges_and_surrounds_silhouette(self):
+        source = pygame.Surface((7, 7), pygame.SRCALPHA)
+        source.fill((0, 0, 0, 0))
+        source.set_at((3, 3), (*palette.GREEN, 255))
+        source.set_at((4, 3), (182, 182, 182, 255))
+
+        result = vga_art.outline_alpha(source)
+
+        self.assertEqual(result.get_at((3, 3))[:3], palette.GREEN)
+        self.assertEqual(result.get_at((4, 3))[:3], palette.BLACK)
+        self.assertEqual(result.get_at((2, 2)), (*palette.BLACK, 255))
+        self.assertEqual(result.get_at((5, 3)), (*palette.BLACK, 255))
+        self.assertEqual(result.get_at((0, 0)).a, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

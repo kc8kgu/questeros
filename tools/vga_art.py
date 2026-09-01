@@ -164,6 +164,47 @@ def strip_pale_alpha_edges(surface, block_size=2):
             result.fill((0, 0, 0, 0), (x, y, block_size, block_size))
 
 
+def outline_alpha(surface, thickness=1, pale_minimum=145):
+    """Clean pale alpha-edge pixels and add a solid black silhouette outline."""
+    if thickness <= 0:
+        raise ValueError("Outline thickness must be positive")
+    source = surface.copy()
+    width, height = source.get_size()
+    neighbors = tuple(
+        (dx, dy)
+        for dy in range(-thickness, thickness + 1)
+        for dx in range(-thickness, thickness + 1)
+        if dx or dy
+    )
+
+    cleaned = source.copy()
+    for y in range(height):
+        for x in range(width):
+            color = source.get_at((x, y))
+            rgb = color[:3]
+            if color.a == 0 or min(rgb) < pale_minimum \
+                    or max(rgb) - min(rgb) > 24:
+                continue
+            if any(
+                    0 <= x + dx < width and 0 <= y + dy < height
+                    and source.get_at((x + dx, y + dy)).a == 0
+                    for dx, dy in neighbors):
+                cleaned.set_at((x, y), (*palette.BLACK, 255))
+
+    result = pygame.Surface((width, height), pygame.SRCALPHA)
+    result.blit(cleaned, (0, 0))
+    for y in range(height):
+        for x in range(width):
+            if source.get_at((x, y)).a:
+                continue
+            if any(
+                    0 <= x + dx < width and 0 <= y + dy < height
+                    and source.get_at((x + dx, y + dy)).a
+                    for dx, dy in neighbors):
+                result.set_at((x, y), (*palette.BLACK, 255))
+    return result
+
+
 def pack_surfaces(surfaces, grid, cell_size, alpha=True):
     """Pack equally sized surfaces in row-major order."""
     columns, rows = grid
@@ -318,6 +359,12 @@ def _shorelines_command(args):
     pygame.image.save(build_shoreline_atlas(args.scale), str(args.output))
 
 
+def _outline_command(args):
+    source = pygame.image.load(str(args.input))
+    result = outline_alpha(source, args.thickness, args.pale_minimum)
+    pygame.image.save(result, str(args.output))
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -357,6 +404,13 @@ def build_parser():
     shorelines.add_argument("output", type=Path)
     shorelines.add_argument("--scale", type=int, default=2)
     shorelines.set_defaults(run=_shorelines_command)
+
+    outline = commands.add_parser("outline")
+    outline.add_argument("input", type=Path)
+    outline.add_argument("output", type=Path)
+    outline.add_argument("--thickness", type=int, default=1)
+    outline.add_argument("--pale-minimum", type=int, default=145)
+    outline.set_defaults(run=_outline_command)
     return parser
 
 

@@ -10,6 +10,7 @@ import pygame
 import combat
 import graphics
 import hud
+import palette
 import settings as s
 from battle_view import BATTLE_RENDER_SIZE
 from graphics import assets
@@ -166,6 +167,32 @@ class GraphicsCacheTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertTrue(cache[key].get_flags() & pygame.SRCALPHA)
                 self.assertEqual(cache[key].get_at((0, 0)).a, 0)
+
+    def test_vga_player_frames_have_black_alpha_edges(self):
+        cache = graphics.build_cache()
+        neighbors = (
+            (-1, -1), (0, -1), (1, -1),
+            (-1, 0), (1, 0),
+            (-1, 1), (0, 1), (1, 1),
+        )
+        for key in (
+                "player:up", "player:down", "player:left", "player:right"):
+            surface = cache[key]
+            edge_colors = []
+            for y in range(surface.get_height()):
+                for x in range(surface.get_width()):
+                    color = surface.get_at((x, y))
+                    if not color.a:
+                        continue
+                    if any(
+                            0 <= x + dx < surface.get_width()
+                            and 0 <= y + dy < surface.get_height()
+                            and not surface.get_at((x + dx, y + dy)).a
+                            for dx, dy in neighbors):
+                        edge_colors.append(color[:3])
+            with self.subTest(key=key):
+                self.assertTrue(edge_colors)
+                self.assertEqual(set(edge_colors), {palette.BLACK})
 
     def test_overworld_props_have_no_pale_pixels_on_alpha_edges(self):
         cache = graphics.build_cache()
