@@ -36,15 +36,37 @@ def nearest_vga(color, cache=None, colors=None):
 
 
 def remove_connected_background(surface):
-    """Make a light neutral background connected to an edge transparent."""
+    """Make a neutral light or dark edge-connected matte transparent."""
     source = surface.copy()
     width, height = source.get_size()
     visited = set()
     pending = deque()
 
+    edge_colors = []
+    for x in range(width):
+        edge_colors.extend((
+            source.get_at((x, 0))[:3],
+            source.get_at((x, height - 1))[:3],
+        ))
+    for y in range(height):
+        edge_colors.extend((
+            source.get_at((0, y))[:3],
+            source.get_at((width - 1, y))[:3],
+        ))
+
+    dark_count = sum(
+        max(rgb) <= 32 and max(rgb) - min(rgb) <= 24
+        for rgb in edge_colors)
+    light_count = sum(
+        min(rgb) >= 120 and max(rgb) - min(rgb) <= 24
+        for rgb in edge_colors)
+    dark_matte = dark_count > light_count
+
     def background_candidate(x, y):
         color = source.get_at((x, y))
         rgb = color[:3]
+        if dark_matte:
+            return max(rgb) <= 32 and max(rgb) - min(rgb) <= 24
         return min(rgb) >= 120 and max(rgb) - min(rgb) <= 24
 
     for x in range(width):
@@ -72,6 +94,46 @@ def remove_connected_background(surface):
             color = source.get_at((x, y))
             alpha = 0 if (x, y) in visited else 255
             result.set_at((x, y), (*color[:3], alpha))
+    return result
+
+
+def remove_alpha_debris(surface):
+    """Discard tiny cutout debris while retaining meaningful sprite parts."""
+    width, height = surface.get_size()
+    visited = set()
+    components = []
+    for start_y in range(height):
+        for start_x in range(width):
+            if (start_x, start_y) in visited \
+                    or surface.get_at((start_x, start_y)).a == 0:
+                continue
+            component = []
+            pending = deque(((start_x, start_y),))
+            while pending:
+                x, y = pending.popleft()
+                if (x, y) in visited or surface.get_at((x, y)).a == 0:
+                    continue
+                visited.add((x, y))
+                component.append((x, y))
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        nx, ny = x + dx, y + dy
+                        if (dx or dy) and 0 <= nx < width and 0 <= ny < height:
+                            pending.append((nx, ny))
+            components.append(component)
+
+    if not components:
+        return surface.copy()
+    largest_size = max(len(component) for component in components)
+    minimum_size = max(8, largest_size // 100)
+    retained = {
+        point
+        for component in components if len(component) >= minimum_size
+        for point in component
+    }
+    result = pygame.Surface((width, height), pygame.SRCALPHA)
+    for x, y in retained:
+        result.set_at((x, y), surface.get_at((x, y)))
     return result
 
 
@@ -317,6 +379,8 @@ def _convert_command(args):
     if args.cutout:
         source = remove_connected_background(source)
     if args.fit:
+        if args.cutout:
+            source = remove_alpha_debris(source)
         source = fit_alpha(source)
     colors = None
     if args.ramp:

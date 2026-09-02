@@ -14,6 +14,12 @@
   but must not generate replacement art.
 - Keep crisp nearest-neighbor edges. Do not use antialiasing, blur, smooth
   gradients, generated text, logos, or watermarks.
+- Generate source concepts for transparent sprites against a uniform black
+  matte, not directly against transparency or a light background. Remove the
+  connected matte offline with `tools/vga_art.py convert --cutout`, quantize
+  to binary-alpha VGA pixels, apply `tools/vga_art.py outline`, and audit the
+  finished sheet. The generated image is only a source concept; do not treat a
+  generated checkerboard or claimed transparent background as final alpha.
 
 ## Readability
 

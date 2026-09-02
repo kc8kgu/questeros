@@ -26,6 +26,10 @@ SHEET_SPECS = {
         "tiles/overworld-simple-vga.png", (6, 1), (64, 64), False),
     "exploration_vga": (
         "sprites/exploration-vga.png", (4, 1), (64, 64), True),
+    "battle_vga_pilot": (
+        "sprites/battle-vga-pilot.png", (3, 1), (64, 64), True),
+    "battle_backdrops_vga_pilot": (
+        "scenes/battle-backdrops-vga-pilot.png", (1, 1), (320, 144), False),
 }
 
 VGA_OVERWORLD_MAP = {
@@ -46,6 +50,18 @@ VGA_PLAYER_MAP = {
     "player:left": (2, 0),
     "player:right": (3, 0),
     "player": (1, 0),
+}
+
+VGA_BATTLE_PILOT_MAP = {
+    "battle_player": (0, 0),
+    "battle_mon_rat": (1, 0),
+    "mon_rat": (1, 0),
+    "battle_mon_dragon": (2, 0),
+    "mon_dragon": (2, 0),
+}
+
+VGA_BATTLE_BACKDROP_PILOT_MAP = {
+    "battle_backdrop_grass": (0, 0),
 }
 
 GRASS_KEYS = ("grass", "grass:v1", "grass:v2", "grass:v3")
@@ -282,4 +298,10 @@ def build_cache():
         "overworld_simple_vga", VGA_OVERWORLD_MAP))
     cache.update(_mapped(
         sheets["exploration_vga"], "exploration_vga", VGA_PLAYER_MAP))
+    cache.update(_mapped(
+        sheets["battle_vga_pilot"],
+        "battle_vga_pilot", VGA_BATTLE_PILOT_MAP))
+    cache.update(_mapped(
+        sheets["battle_backdrops_vga_pilot"],
+        "battle_backdrops_vga_pilot", VGA_BATTLE_BACKDROP_PILOT_MAP))
     return cache

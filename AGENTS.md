@@ -12,6 +12,9 @@ PNG sprite sheets.
 
   SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy .venv/Scripts/python.exe -c "import threading, pygame; from main import Game; game = Game(); threading.Timer(5, lambda: pygame.event.post(pygame.event.Event(pygame.QUIT))).start(); game.run()"
 
+- Do not run automated tests or the dummy-SDL smoke test unless the user
+  explicitly asks for them.
+
 ## Rules
 
 - All visual art is committed PNG atlas data. Do not add generated-at-runtime

@@ -196,6 +196,11 @@ STONE_RAMP = (
 WATER_RAMP = (
     NIGHT, OCEAN_DARK, DEEP_WATER, OCEAN, TEAL, OCEAN_LIGHT, FOAM, ICE,
 )
+SKY_RAMP = (
+    palette_color(1), palette_color(55), palette_color(54),
+    palette_color(53), palette_color(79), palette_color(78),
+    palette_color(77), palette_color(102), WHITE,
+)
 SKIN_RAMP = (
     palette_color(185), palette_color(209), palette_color(137),
     palette_color(65), palette_color(89), palette_color(91),
@@ -216,6 +221,7 @@ RAMPS = {
     "sand": SAND_RAMP,
     "stone": STONE_RAMP,
     "water": WATER_RAMP,
+    "sky": SKY_RAMP,
     "skin": SKIN_RAMP,
     "metal": METAL_RAMP,
     "fire": FIRE_RAMP,

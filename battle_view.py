@@ -35,6 +35,8 @@ PLAYER_POS = (112, 218)
 PLAYER_SIZE = (188, 202)
 BATTLE_RENDER_SIZE = (960, 624)
 BACKDROP_DRAW_SIZE = (960, 432)
+VGA_CELL_DRAW_SIZE = (192, 192)
+VGA_PILOT_MONSTERS = {"rat", "dragon"}
 
 ACTION_LABELS = {
     combat.ACTION_ATTACK: "Attack",
@@ -82,7 +84,8 @@ def _draw_scene(screen, battle, cache, selected, feedback, terrain):
             _offset_position(MONSTER_POS, offset),
             recoil_offset(feedback, "monster")),
         MONSTER_SIZE,
-        _target_flashes(feedback, "monster"))
+        _target_flashes(feedback, "monster"),
+        preserve_cell=monster["id"] in VGA_PILOT_MONSTERS)
 
     name = hud.get_font(22, scaled=False).render(
         monster["name"], True, s.YELLOW)
@@ -100,7 +103,7 @@ def _draw_scene(screen, battle, cache, selected, feedback, terrain):
             _offset_position(PLAYER_POS, offset),
             recoil_offset(feedback, "player")),
         PLAYER_SIZE,
-        _target_flashes(feedback, "player"))
+        _target_flashes(feedback, "player"), preserve_cell=True)
 
     _draw_hit_effects(screen, feedback, cache, offset)
 
@@ -177,10 +180,21 @@ def _draw_actions(screen, cache, selected, offset):
         ))
 
 
-def _draw_combatant(screen, source, position, size, flashes):
-    bounds = source.get_bounding_rect(min_alpha=1)
-    visible = source.subsurface(bounds) if bounds.width and bounds.height else source
-    art = pygame.transform.scale(visible, size)
+def _draw_combatant(
+        screen, source, position, size, flashes, preserve_cell=False):
+    if preserve_cell:
+        art = pygame.transform.scale(source, VGA_CELL_DRAW_SIZE)
+        bounds = art.get_bounding_rect(min_alpha=1)
+        position = (
+            position[0],
+            position[1] + VGA_CELL_DRAW_SIZE[1] - bounds.bottom,
+        )
+    else:
+        bounds = source.get_bounding_rect(min_alpha=1)
+        visible = (
+            source.subsurface(bounds) if bounds.width and bounds.height
+            else source)
+        art = pygame.transform.scale(visible, size)
     if flashes:
         art.fill(p.WHITE_WARM, special_flags=pygame.BLEND_RGB_MAX)
     screen.blit(art, position)

@@ -75,6 +75,17 @@ class VgaArtTests(unittest.TestCase):
         self.assertEqual(result.get_at((1, 1)).a, 255)
         self.assertEqual(result.get_at((2, 2)).a, 255)
 
+    def test_connected_dark_background_becomes_transparent(self):
+        source = pygame.Surface((5, 5))
+        source.fill((1, 1, 1))
+        source.fill((40, 70, 50), (1, 1, 3, 3))
+        source.set_at((2, 2), (0, 0, 0))
+        result = vga_art.remove_connected_background(source)
+
+        self.assertEqual(result.get_at((0, 0)).a, 0)
+        self.assertEqual(result.get_at((1, 1)).a, 255)
+        self.assertEqual(result.get_at((2, 2)), (0, 0, 0, 255))
+
     def test_fit_alpha_centers_cutout_on_square_canvas(self):
         source = pygame.Surface((12, 8), pygame.SRCALPHA)
         source.fill((0, 0, 0, 0))
